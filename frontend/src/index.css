@@ -1,0 +1,508 @@
+:root {
+  --text: #667085;
+  --text-h: #171321;
+
+  --bg: #f7f7fb;
+  --card: #ffffff;
+
+  --border: #e7e5ec;
+
+  --accent: #8b3dff;
+  --accent-dark: #7028e8;
+  --accent-bg: #f3edff;
+
+  --success: #16a34a;
+  --danger: #dc2626;
+
+  --shadow:
+    0 20px 50px rgba(31, 20, 55, 0.08);
+
+  --sans:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+
+  font-family: var(--sans);
+
+  color: var(--text-h);
+  background: var(--bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* ==========================================
+   BODY
+========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(139, 61, 255, 0.10),
+      transparent 35%
+    ),
+    var(--bg);
+}
+
+
+/* ==========================================
+   ROOT
+========================================== */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+}
+
+
+/* ==========================================
+   APP
+========================================== */
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 55px 20px 80px;
+
+  display: flex;
+  justify-content: center;
+}
+
+
+/* ==========================================
+   MAIN CARD
+========================================== */
+
+.card {
+  width: 100%;
+  max-width: 850px;
+
+  background: var(--card);
+
+  border: 1px solid var(--border);
+
+  border-radius: 24px;
+
+  padding: 45px;
+
+  box-shadow: var(--shadow);
+
+  text-align: center;
+}
+
+
+/* ==========================================
+   TITLE
+========================================== */
+
+h1 {
+  margin: 0;
+
+  font-size: 42px;
+  line-height: 1.15;
+
+  letter-spacing: -1.2px;
+
+  font-weight: 700;
+
+  color: var(--text-h);
+}
+
+
+.subtitle {
+  margin-top: 12px;
+  margin-bottom: 35px;
+
+  color: var(--text);
+
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+
+/* ==========================================
+   RECORD BUTTON
+========================================== */
+
+.record-btn {
+  border: none;
+
+  min-width: 230px;
+
+  padding: 16px 28px;
+
+  border-radius: 14px;
+
+  background: var(--accent);
+
+  color: white;
+
+  font-family: inherit;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 25px rgba(139, 61, 255, 0.25);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.record-btn:hover {
+  background: var(--accent-dark);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 30px rgba(139, 61, 255, 0.30);
+}
+
+
+.record-btn:active {
+  transform: translateY(0);
+}
+
+
+.record-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* ==========================================
+   RECORDING STATE
+========================================== */
+
+.record-btn.recording {
+  background: #dc2626;
+
+  box-shadow:
+    0 10px 25px rgba(220, 38, 38, 0.25);
+
+  animation: pulse 1.5s infinite;
+}
+
+
+.record-btn.recording:hover {
+  background: #b91c1c;
+}
+
+
+@keyframes pulse {
+
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(220, 38, 38, 0.35);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 12px rgba(220, 38, 38, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(220, 38, 38, 0);
+  }
+
+}
+
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.status {
+  min-height: 25px;
+
+  margin: 18px 0 30px;
+
+  font-size: 14px;
+
+  color: var(--text);
+
+  font-weight: 500;
+}
+
+
+/* ==========================================
+   TRANSCRIPT
+========================================== */
+
+.transcript-box {
+  margin-top: 20px;
+
+  padding: 24px;
+
+  text-align: left;
+
+  background: #faf9fc;
+
+  border: 1px solid var(--border);
+
+  border-radius: 18px;
+}
+
+
+.transcript-box h2 {
+  margin: 0 0 12px;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: var(--text-h);
+}
+
+
+.transcript-box p {
+  color: var(--text);
+
+  line-height: 1.7;
+
+  word-break: break-word;
+}
+
+
+/* ==========================================
+   PROFILE
+========================================== */
+
+.profile-box {
+  margin-top: 20px;
+
+  padding: 25px;
+
+  text-align: left;
+
+  background:
+    linear-gradient(
+      135deg,
+      #faf7ff,
+      #ffffff
+    );
+
+  border: 1px solid var(--accent-border);
+
+  border-radius: 18px;
+}
+
+
+.profile-box h2 {
+  margin: 0 0 18px;
+
+  font-size: 19px;
+
+  font-weight: 700;
+
+  color: var(--text-h);
+}
+
+
+.profile-box p {
+  margin: 10px 0;
+
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  background: rgba(139, 61, 255, 0.04);
+
+  color: var(--text);
+
+  line-height: 1.5;
+}
+
+
+.profile-box strong {
+  color: var(--text-h);
+}
+
+
+/* ==========================================
+   TRY SAYING
+========================================== */
+
+.try-saying-box {
+  margin-top: 25px;
+
+  padding: 28px;
+
+  text-align: left;
+
+  background: #ffffff;
+
+  border: 1px solid var(--border);
+
+  border-radius: 18px;
+}
+
+
+.try-saying-box > h2 {
+  margin: 0 0 22px;
+
+  font-size: 21px;
+
+  font-weight: 700;
+
+  color: var(--text-h);
+}
+
+
+.try-section {
+  margin-bottom: 24px;
+
+  padding: 18px;
+
+  border-radius: 14px;
+
+  background: #faf9fc;
+
+  border: 1px solid #eeeaf5;
+}
+
+
+.try-section:last-child {
+  margin-bottom: 0;
+}
+
+
+.try-section h3 {
+  margin: 0 0 10px;
+
+  color: var(--accent);
+
+  font-size: 15px;
+
+  font-weight: 700;
+}
+
+
+.try-section p {
+  margin: 8px 0;
+
+  color: var(--text);
+
+  font-size: 14px;
+
+  line-height: 1.65;
+}
+
+
+/* ==========================================
+   CODE / INLINE TEXT
+========================================== */
+
+code {
+  padding: 4px 7px;
+
+  border-radius: 6px;
+
+  background: var(--accent-bg);
+
+  color: var(--accent-dark);
+
+  font-size: 14px;
+}
+
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+::-webkit-scrollbar-thumb {
+  background: #d5cde2;
+
+  border-radius: 10px;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+
+  .app {
+    padding: 25px 12px 50px;
+  }
+
+
+  .card {
+    padding: 28px 18px;
+
+    border-radius: 18px;
+  }
+
+
+  h1 {
+    font-size: 32px;
+
+    letter-spacing: -0.8px;
+  }
+
+
+  .subtitle {
+    font-size: 14px;
+
+    margin-bottom: 28px;
+  }
+
+
+  .record-btn {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+
+  .transcript-box,
+  .profile-box,
+  .try-saying-box {
+    padding: 18px;
+  }
+
+
+  .try-section {
+    padding: 15px;
+  }
+
+}
