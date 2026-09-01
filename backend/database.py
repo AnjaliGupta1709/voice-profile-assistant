@@ -1,5 +1,5 @@
-from pymongo import MongoClient
 import os
+from pymongo import MongoClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,20 +11,14 @@ if not MONGO_URI:
 
 client = MongoClient(
     MONGO_URI,
+    tls=True,
+    tlsAllowInvalidCertificates=False,
     serverSelectionTimeoutMS=10000,
-    connectTimeoutMS=10000
+    connectTimeoutMS=10000,
 )
-
-# Check MongoDB connection immediately
-try:
-    client.admin.command("ping")
-    print("MongoDB connected successfully!")
-except Exception as error:
-    print("MongoDB connection failed:", error)
-    raise
 
 db = client["UserDB"]
 
 users_collection = db["voice_profiles"]
 
-print("MongoDB connection file loaded successfully!")
+print("MongoDB client initialized successfully!")
