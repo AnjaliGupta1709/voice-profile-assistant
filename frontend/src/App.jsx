@@ -195,7 +195,7 @@ function App() {
 
       const response =
         await fetch(
-          "http://127.0.0.1:5000/transcribe",
+          "https://voice-user-profile-backend-nszl.onrender.com/transcribe",
           {
             method: "POST",
             body: formData,
