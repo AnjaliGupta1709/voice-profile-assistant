@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask.json.provider import DefaultJSONProvider
 from bson import ObjectId
 from flask_cors import CORS
-import whisper
+from faster_whisper import WhisperModel
 import os
 import tempfile
 import re
@@ -35,7 +35,11 @@ CORS(app)
 
 print("Loading Whisper model...")
 
-model = whisper.load_model("base")
+model = WhisperModel(
+    "base",
+    device="cpu",
+    compute_type="int8"
+)
 
 print("Whisper model loaded successfully!")
 
@@ -168,7 +172,7 @@ def transcribe():
         # WHISPER
         # ==========================================
 
-        result = model.transcribe(
+        segments, info = model.transcribe(
 
             temp_path,
 
@@ -176,23 +180,20 @@ def transcribe():
 
             task="transcribe",
 
-            fp16=False,
-
-            temperature=0,
-
             beam_size=1,
 
             best_of=1,
+
+            temperature=0,
 
             condition_on_previous_text=False
 
         )
 
 
-        transcript = (
-            result["text"]
-            .strip()
-        )
+        transcript = " ".join(
+            segment.text for segment in segments
+        ).strip()
 
 
         print(
