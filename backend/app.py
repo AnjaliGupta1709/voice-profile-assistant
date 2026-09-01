@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask.json.provider import DefaultJSONProvider
 from bson import ObjectId
 from flask_cors import CORS
-from faster_whisper import WhisperModel
+from groq import Groq
 import os
 import tempfile
 import re
@@ -38,31 +38,14 @@ CORS(app)
 
 
 # ==========================================
-# WHISPER MODEL
+# GROQ CLIENT
 # ==========================================
 
-print("Whisper model will be loaded when needed...")
+groq_client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
 
-model = None
-
-
-def get_whisper_model():
-
-    global model
-
-    if model is None:
-
-        print("Loading Whisper model...")
-
-        model = WhisperModel(
-            "tiny",
-            device="cpu",
-            compute_type="int8"
-        )
-
-        print("Whisper model loaded successfully!")
-
-    return model
+print("Groq transcription is ready!")
 
 
 # ==========================================
@@ -189,44 +172,65 @@ def transcribe():
             temp_path = temp.name
 
 
-        # ==========================================
-        # WHISPER
-        # ==========================================
-
-        whisper_model = get_whisper_model()
-
-        segments, info = whisper_model.transcribe(
-
-            temp_path,
-
-            language="en",
-
-            task="transcribe",
-
-            beam_size=1,
-
-            best_of=1,
-
-            temperature=0,
-
-            condition_on_previous_text=False
-
+        print(
+            "Audio file saved:",
+            temp_path
         )
 
 
-        transcript = " ".join(
-            segment.text for segment in segments
-        ).strip()
+        # ==========================================
+        # GROQ TRANSCRIPTION
+        # ==========================================
+
+        print(
+            "Sending audio to Groq..."
+        )
+
+
+        with open(
+            temp_path,
+            "rb"
+        ) as audio:
+
+            transcription = (
+                groq_client
+                .audio
+                .transcriptions
+                .create(
+                    file=audio,
+                    model="whisper-large-v3-turbo",
+                    language="en",
+                    response_format="json"
+                )
+            )
+
+
+        transcript = (
+            transcription.text
+            .strip()
+        )
 
 
         print(
-            "Whisper transcript:",
+            "Groq transcript:",
             transcript
         )
 
 
+        if not transcript:
+
+            return jsonify({
+
+                "success": False,
+
+                "error":
+                "Could not understand the audio"
+
+            }), 400
+
+
         # ==========================================
-        # GROQ
+        # PROFILE EXTRACTION
         # ==========================================
 
         profile = extract_profile(
@@ -244,7 +248,11 @@ def transcribe():
         # SIMPLE VOICE COMMAND DETECTION
         # ==========================================
 
-        lower_transcript = transcript.lower().strip()
+        lower_transcript = (
+            transcript
+            .lower()
+            .strip()
+        )
 
 
         # ==========================================
@@ -254,6 +262,7 @@ def transcribe():
         if lower_transcript.startswith("show "):
 
             profile["action"] = "show"
+
 
             target_text = re.sub(
                 r"^show\s+",
@@ -292,10 +301,12 @@ def transcribe():
 
         elif (
             lower_transcript.startswith("delete ")
-            or lower_transcript.startswith("remove ")
+            or
+            lower_transcript.startswith("remove ")
         ):
 
             profile["action"] = "delete"
+
 
             target_text = re.sub(
                 r"^(?:delete|remove)\s+",
@@ -326,10 +337,12 @@ def transcribe():
 
         elif (
             lower_transcript.startswith("update ")
-            or lower_transcript.startswith("change ")
+            or
+            lower_transcript.startswith("change ")
         ):
 
             profile["action"] = "update"
+
 
             match = re.match(
                 r"^(?:update|change)\s+(.+?)(?:['’]s)?\s+(?:name|email|phone|phone\s+number|city|occupation)\s+(?:to|as)\s+",
@@ -459,11 +472,13 @@ def transcribe():
             target_user = users_collection.find_one({
 
                 "name": {
+
                     "$regex":
                     f"^{re.escape(clean_target_name)}(?:\\s+.*)?$",
 
                     "$options":
                     "i"
+
                 }
 
             })
@@ -688,8 +703,10 @@ def transcribe():
                     update_data["email"],
 
                     "_id": {
+
                         "$ne":
                         target_user["_id"]
+
                     }
 
                 })
@@ -866,6 +883,7 @@ def transcribe():
                     "Profile updated successfully"
                 )
 
+
             else:
 
                 users_collection.insert_one(
@@ -875,6 +893,7 @@ def transcribe():
                 message = (
                     "Profile created successfully"
                 )
+
 
         else:
 
@@ -915,6 +934,7 @@ def transcribe():
             "Transcription error:",
             error
         )
+
 
         return jsonify({
 
