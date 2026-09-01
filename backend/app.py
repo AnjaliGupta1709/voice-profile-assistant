@@ -11,6 +11,10 @@ from groq_service import extract_profile
 from database import users_collection
 
 
+# ==========================================
+# MONGO JSON PROVIDER
+# ==========================================
+
 class MongoJSONProvider(DefaultJSONProvider):
 
     def default(self, obj):
@@ -21,6 +25,10 @@ class MongoJSONProvider(DefaultJSONProvider):
         return super().default(obj)
 
 
+# ==========================================
+# FLASK APP
+# ==========================================
+
 app = Flask(__name__)
 
 app.json_provider_class = MongoJSONProvider
@@ -30,18 +38,31 @@ CORS(app)
 
 
 # ==========================================
-# LOAD WHISPER MODEL
+# WHISPER MODEL
 # ==========================================
 
-print("Loading Whisper model...")
+print("Whisper model will be loaded when needed...")
 
-model = WhisperModel(
-    "base",
-    device="cpu",
-    compute_type="int8"
-)
+model = None
 
-print("Whisper model loaded successfully!")
+
+def get_whisper_model():
+
+    global model
+
+    if model is None:
+
+        print("Loading Whisper model...")
+
+        model = WhisperModel(
+            "tiny",
+            device="cpu",
+            compute_type="int8"
+        )
+
+        print("Whisper model loaded successfully!")
+
+    return model
 
 
 # ==========================================
@@ -172,7 +193,9 @@ def transcribe():
         # WHISPER
         # ==========================================
 
-        segments, info = model.transcribe(
+        whisper_model = get_whisper_model()
+
+        segments, info = whisper_model.transcribe(
 
             temp_path,
 
@@ -223,7 +246,11 @@ def transcribe():
 
         lower_transcript = transcript.lower().strip()
 
+
+        # ==========================================
         # SHOW COMMAND
+        # ==========================================
+
         if lower_transcript.startswith("show "):
 
             profile["action"] = "show"
@@ -235,12 +262,14 @@ def transcribe():
                 flags=re.IGNORECASE
             ).strip()
 
+
             target_text = re.sub(
                 r"['’]s\s+(?:profile|details?)$",
                 "",
                 target_text,
                 flags=re.IGNORECASE
             ).strip()
+
 
             target_text = re.sub(
                 r"\s+(?:profile|details?)$",
@@ -249,13 +278,18 @@ def transcribe():
                 flags=re.IGNORECASE
             ).strip()
 
+
             profile["target_name"] = (
                 target_text
                 .strip()
                 .strip(".,!?")
             )
 
+
+        # ==========================================
         # DELETE / REMOVE COMMAND
+        # ==========================================
+
         elif (
             lower_transcript.startswith("delete ")
             or lower_transcript.startswith("remove ")
@@ -270,6 +304,7 @@ def transcribe():
                 flags=re.IGNORECASE
             ).strip()
 
+
             target_text = re.sub(
                 r"['’]s\s+(?:profile|details?)$",
                 "",
@@ -277,13 +312,18 @@ def transcribe():
                 flags=re.IGNORECASE
             ).strip()
 
+
             profile["target_name"] = (
                 target_text
                 .strip()
                 .strip(".,!?")
             )
 
+
+        # ==========================================
         # UPDATE / CHANGE COMMAND
+        # ==========================================
+
         elif (
             lower_transcript.startswith("update ")
             or lower_transcript.startswith("change ")
@@ -297,6 +337,7 @@ def transcribe():
                 flags=re.IGNORECASE
             )
 
+
             if match:
 
                 profile["target_name"] = (
@@ -306,6 +347,7 @@ def transcribe():
                     .strip(".,!?")
                 )
 
+
             elif not profile.get("target_name"):
 
                 match = re.match(
@@ -313,6 +355,7 @@ def transcribe():
                     transcript,
                     flags=re.IGNORECASE
                 )
+
 
                 if match:
 
@@ -323,11 +366,16 @@ def transcribe():
                         .strip(".,!?")
                     )
 
+
         print(
             "Final voice action:",
             profile
         )
 
+
+        # ==========================================
+        # ACTION
+        # ==========================================
 
         action = profile.get(
             "action",
@@ -353,6 +401,7 @@ def transcribe():
 
         cleaned_transcript = transcript
 
+
         if profile.get("email"):
 
             email = (
@@ -360,6 +409,7 @@ def transcribe():
                 .lower()
                 .replace(" ", "")
             )
+
 
             cleaned_transcript = re.sub(
 
@@ -405,6 +455,7 @@ def transcribe():
                 .strip(".,!?")
             )
 
+
             target_user = users_collection.find_one({
 
                 "name": {
@@ -445,10 +496,14 @@ def transcribe():
 
 
             user = {
+
                 key: value
+
                 for key, value
                 in target_user.items()
+
                 if key != "_id"
+
             }
 
 
