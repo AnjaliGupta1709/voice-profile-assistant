@@ -73,6 +73,32 @@ def health():
 
 
 # ==========================================
+# MONGO CONNECTION TEST
+# ==========================================
+
+@app.route("/mongo-test", methods=["GET"])
+def mongo_test():
+
+    try:
+
+        result = users_collection.database.client.admin.command("ping")
+
+        return jsonify({
+            "status": "success",
+            "mongo": result
+        }), 200
+
+    except Exception as error:
+
+        print("MongoDB test error:", error)
+
+        return jsonify({
+            "status": "error",
+            "error": str(error)
+        }), 500
+
+
+# ==========================================
 # GET USERS
 # ==========================================
 

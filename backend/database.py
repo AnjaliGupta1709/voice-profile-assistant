@@ -1,5 +1,7 @@
 import os
+
 from pymongo import MongoClient
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,13 +13,15 @@ if not MONGO_URI:
 
 client = MongoClient(
     MONGO_URI,
-    serverSelectionTimeoutMS=10000,
-    connectTimeoutMS=10000,
     tls=True,
-    tlsAllowInvalidCertificates=True
+    tlsVersion="TLSv1.2",
+    tlsAllowInvalidCertificates=True,
+    serverSelectionTimeoutMS=30000,
+    connectTimeoutMS=30000,
+    socketTimeoutMS=30000
 )
 
-db = client["UserDB"]
+db = client["userDB"]
 
 users_collection = db["voice_profiles"]
 
